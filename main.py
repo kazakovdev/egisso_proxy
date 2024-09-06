@@ -6,13 +6,15 @@ import concurrent.futures as pool
 import threading
 import random
 from threading import Lock
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 lock = Lock()
 ddosed = []
+
+
 def go(terr_id, d, proxy_list):
-    a = {}
 
-
-    dates = [#'2024-06-01','2024-05-01', '2024-04-01',
+    dates = ['2024-06-01','2024-05-01', '2024-04-01',
               '2024-03-01',
           '2024-01-01', '2024-02-01',
          '2023-12-01', '2023-11-01',  '2023-10-01', '2023-09-01',
@@ -29,6 +31,7 @@ def go(terr_id, d, proxy_list):
                # '2020-04-01', '2020-05-01', '2020-06-01', '2020-07-01', '2020-08-01', '2020-09-01', '2020-10-01',
                # '2020-11-01', '2020-12-01'
              ]
+
     headers = {
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'en-US,en;q=0.9,ru-RU;q=0.8,ru;q=0.7,be;q=0.6',
@@ -39,8 +42,8 @@ def go(terr_id, d, proxy_list):
     'Host': 'ka.egisso.ru',
     'Upgrade-Insecure-Requests': '1',
     'User-Agent': f"""Mozilla/{random.randint(1,10)}.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36""",
-
     }
+
     a = {}
     global ddosed
     for date in dates[::-1]:
@@ -64,14 +67,13 @@ def go(terr_id, d, proxy_list):
                 print('timeout, next proxy...')
                 time.sleep(30)
             except:
-
                 time.sleep(30)
                 continue
 
 
         data_json = json.loads(response.text)
         if not data_json['data']:
-            print('there is no territory ', terr_id)
+            print('there is no territory ', terr_id, ' in dash: ', d)
             continue
         data_json.update({'region_id': terr_id, 'date': date})
         a.update({date: data_json})
@@ -81,10 +83,9 @@ def go(terr_id, d, proxy_list):
         json.dump(a, f, ensure_ascii=False)
 
 
-db = [1,2,3,4,5,6,7,8,9,
-    14,15,
-    16,10,
-    11,12,13]
+db = [1, 2, 3, 4, 5, 6, 7, 8, 9,
+      10, 11, 12, 13, 14, 15, 16, 17
+      ]
 
 proxy_list = [
     'noproxy',
@@ -111,6 +112,7 @@ print(db)
 
 for d in db:
     print('START DASHBOARD: ', d)
-    for i in [x for x in range(-1, 100) if x not in (0,2,6,9,13,16,31, 21, 43, 74, 23, 39, 62, 59,51,48,72)]:
+    for i in [x for x in range(1, 100) if x not in (2, 6, 9, 13, 16, 31, 21, 43, 74, 23, 39, 62, 59, 51, 48, 72)]:
         executor.submit(go, i, d, proxy_list)
+
 
